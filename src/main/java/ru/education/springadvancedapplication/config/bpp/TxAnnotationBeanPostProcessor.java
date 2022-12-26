@@ -8,7 +8,6 @@ import ru.education.springadvancedapplication.config.annotation.Tx;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class TxAnnotationBeanPostProcessor implements BeanPostProcessor {
     private final Map<String,Method> txAnnotatedMethod =new HashMap<>();
@@ -42,9 +41,8 @@ public class TxAnnotationBeanPostProcessor implements BeanPostProcessor {
                      if (txAnnotatedMethod.containsKey(method.getName())) {
                          var screen = createScreen(args);
                          try {
-                             invoke = method.invoke(bean, args);
+                             invoke = method.invoke(bean, screen.toArray());
                          } catch (Exception e) {
-                             rollback(args,screen);
                              throw new RuntimeException("rollback");
                          }
                      } else {
@@ -58,9 +56,6 @@ public class TxAnnotationBeanPostProcessor implements BeanPostProcessor {
             var screen = new ArrayList<>();
             Arrays.stream(args).forEach(arg->screen.add(copyObject(arg)));
             return screen;
-        }
-        private void rollback(Object[]args,List<Object>screen){
-            IntStream.range(0,args.length).forEach(i -> args[i]=screen.get(i));
         }
         private Object copyObject(Object object) {
             try

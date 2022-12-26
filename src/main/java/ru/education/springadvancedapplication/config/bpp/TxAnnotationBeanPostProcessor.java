@@ -8,6 +8,7 @@ import ru.education.springadvancedapplication.config.annotation.Tx;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class TxAnnotationBeanPostProcessor implements BeanPostProcessor {
     private final Map<String,Method> txAnnotatedMethod =new HashMap<>();
@@ -54,10 +55,8 @@ public class TxAnnotationBeanPostProcessor implements BeanPostProcessor {
         });
     }
         private List<Object> createScreen(Object[] args){
-            ArrayList<Object> screen = new ArrayList<>();
-            for (var arg: args){
-               screen.add(copyObject(arg));
-            }
+            var screen = new ArrayList<>();
+            Arrays.stream(args).forEach(arg->screen.add(copyObject(arg)));
             return screen;
         }
         private void rollback(Object[]args,List<Object>screen){

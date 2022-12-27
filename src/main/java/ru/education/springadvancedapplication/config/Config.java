@@ -8,34 +8,23 @@ import org.springframework.context.annotation.Scope;
 import ru.education.springadvancedapplication.config.bfpp.TxBeanFactoryPostProcessor;
 import ru.education.springadvancedapplication.config.bpp.TxAnnotationBeanPostProcessor;
 import ru.education.springadvancedapplication.persistance.model.Session;
-import ru.education.springadvancedapplication.service.TaskService;
-import ru.education.springadvancedapplication.service.impl.TaskServiceImpl;
 
 @Configuration
 public class Config {
 
     @Bean
-    BeanPostProcessor txBeanPostProcessor(){
+    BeanPostProcessor txBeanPostProcessor() {
         return new TxAnnotationBeanPostProcessor();
     }
 
     @Bean
-    BeanFactoryPostProcessor txBeanFactoryPostProcessor(){
+    BeanFactoryPostProcessor txBeanFactoryPostProcessor() {
         return new TxBeanFactoryPostProcessor();
     }
 
-    @Scope(scopeName = "tx")
-    @Bean
+    @Bean("customSession")
+    @Scope("tx")
     public Session session() {
         return new Session();
     }
-//    @Bean
-//    TaskService taskService(){
-//        return new TaskServiceImpl() {
-//            @Override
-//            public Session getSession() {
-//                return session();
-//            }
-//        };
-//    }
 }

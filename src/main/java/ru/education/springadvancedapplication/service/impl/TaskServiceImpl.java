@@ -1,7 +1,8 @@
 package ru.education.springadvancedapplication.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Lookup;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import ru.education.springadvancedapplication.config.annotation.Tx;
 import ru.education.springadvancedapplication.persistance.model.Session;
@@ -12,29 +13,44 @@ import java.util.Objects;
 
 @Slf4j
 @Service
-public class TaskServiceImpl implements TaskService {
+public  class TaskServiceImpl implements TaskService {
+
+//    @Lookup
+//    public Session getSession(){
+//        return null;
+//    }
+
+    @Autowired
+    private ApplicationContext context;
+    public Session getSession(){
+        return (Session) context.getBean("customSession");
+    }
 
 
     @Override
     @Tx
     public Task executeStatement(Task task) {
-        //log.info("session id: {}",getSession().getUuid());
+        var session = getSession();
+        log.warn("session id{}",session.getUuid());
         log.info("executed task id:{},",task.getId());
         task.setName(changeString(task.getName()));
         task.setStatus(changeString(task.getStatus()));
         task.setComment(changeString(task.getComment()));
         log.info("success execute task id:{},",task.getId());
+        log.warn("session id{} finish",session.getUuid());
         return task;
     }
 
     @Override
-    public void testMethod() {
+    public Task testMethod(Task task) {
         log.info("it is test method without Tx annotation");
+        var session = getSession();
+        log.warn("session id{}",session.getUuid());
+        return task;
     }
     private String changeString(String origin){
         Objects.requireNonNull(origin);
         return origin+"Executed";
     }
 
-//    public abstract Session getSession();
 }

@@ -9,6 +9,6 @@ public class TxBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory factory) throws BeansException {
-        factory.registerScope("tx", new TxScopeConfigurer());
+        factory.registerScope(TxScopeConfigurer.ID, new TxScopeConfigurer());
     }
 }

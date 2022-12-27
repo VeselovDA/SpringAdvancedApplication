@@ -1,94 +1,76 @@
 package ru.education.springadvancedapplication.config.bpp;
 
+import lombok.SneakyThrows;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.lang.Nullable;
 import ru.education.springadvancedapplication.config.annotation.Tx;
+import ru.education.springadvancedapplication.persistance.model.Task;
 
 import java.lang.reflect.*;
-import java.util.*;
-import java.util.stream.IntStream;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TxAnnotationBeanPostProcessor implements BeanPostProcessor {
-    private final Map<String,Method> txAnnotatedMethod =new HashMap<>();
+    private final Map<String, Method> txAnnotatedMethod = new HashMap<>();
+
     @Override
-     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         Arrays.stream(bean.getClass().getMethods()).forEach(method -> {
-            if (method.isAnnotationPresent(Tx.class)){
-                txAnnotatedMethod.put(method.getName(),method);
+            if (method.isAnnotationPresent(Tx.class)) {
+                txAnnotatedMethod.put(method.getName(), method);
             }
         });
         return bean;
     }
 
     @Nullable
-    public  Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        var annotatedMethods=new ArrayList<Method>();
-        Arrays.stream(bean.getClass().getMethods()).forEach(method -> {
-            var annotatedMethod= txAnnotatedMethod.get(method.getName());
-            if (Objects.nonNull(annotatedMethod)){
-                annotatedMethods.add(annotatedMethod);
-            }
-        });
-        if(annotatedMethods.isEmpty()){
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        long countTxAnnotatedMethod = Arrays.stream(bean.getClass().getMethods())
+                .filter(method -> txAnnotatedMethod.containsKey(method.getName()))
+                .count();
+        if (countTxAnnotatedMethod == 0) {
             return bean;
         }
-        var beanClass=bean.getClass();
+        var beanClass = bean.getClass();
         return Proxy.newProxyInstance(beanClass.getClassLoader(), beanClass.getInterfaces(), new InvocationHandler() {
-                 @Override
-                 public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                     Object invoke;
-                     if (txAnnotatedMethod.containsKey(method.getName())) {
-                         var screen = createScreen(args);
-                         try {
-                             invoke = method.invoke(bean, screen.toArray());
-                         } catch (Exception e) {
-                             throw new RuntimeException("rollback");
-                         }
-                     } else {
-                         invoke = method.invoke(bean, args);
-                     }
-                     return invoke;
-                 }
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                var inputTask = (Task) args[0];
+                var copyTask = copyTask(inputTask);
+
+                if (txAnnotatedMethod.containsKey(method.getName())) {
+                    try {
+                        var invoke = (Task) method.invoke(bean, copyTask);
+                        return copyFieldsFromDonor(inputTask, invoke);
+                    } catch (Exception e) {
+                        throw new RuntimeException("rollback");
+                    }
+                } else {
+                    return method.invoke(bean, args);
+                }
+            }
         });
     }
-        private List<Object> createScreen(Object[] args){
-            var screen = new ArrayList<>();
-            Arrays.stream(args).forEach(arg->screen.add(copyObject(arg)));
-            return screen;
+
+    @SneakyThrows
+    private Task copyTask(Task inputTask) {
+        Task clone = new Task();
+        for (Field field : Task.class.getDeclaredFields()) {
+            field.setAccessible(true);
+            field.set(clone, field.get(inputTask));
         }
-        private Object copyObject(Object object) {
-            try
-            {
-                Object clone = object.getClass().newInstance();
-                for(Field field : object.getClass().getDeclaredFields()) {
-                    field.setAccessible(true);
-                    if(field.get(object) == null || Modifier.isFinal(field.getModifiers()))
-                    {
-                        continue;
-                    }
-                    if(field.getType().isPrimitive()
-                            || field.getType().equals(String.class)
-                            || field.getType().getSuperclass().equals(Number.class)
-                            || field.getType().equals(Boolean.class))
-                    {
-                        field.set(clone, field.get(object));
-                    }
-                    else {
-                        Object childObj = field.get(object);
-                        if(childObj == object) {
-                            field.set(clone,clone);
-                        }
-                        else {
-                            field.set(clone,copyObject(field.get(object)));
-                        }
-                    }
-                }
-                return clone;
-            }
-            catch (Exception e) {
-                return  null;
-            }
+        return clone;
+    }
+
+    @SneakyThrows
+    private Task copyFieldsFromDonor(Task target, Task donor) {
+        for (Field field : Task.class.getDeclaredFields()) {
+            field.setAccessible(true);
+            field.set(target, field.get(donor));
         }
+        return target;
+    }
 
 }

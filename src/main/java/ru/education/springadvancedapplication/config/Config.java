@@ -5,6 +5,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import ru.education.springadvancedapplication.config.bfpp.TxBeanFactoryPostProcessor;
 import ru.education.springadvancedapplication.config.bpp.TxAnnotationBeanPostProcessor;
 import ru.education.springadvancedapplication.persistance.model.Session;
@@ -23,7 +24,7 @@ public class Config {
     }
 
     @Bean("customSession")
-    @Scope("tx")
+    @Scope(value = "tx",proxyMode = ScopedProxyMode.TARGET_CLASS)
     public Session session() {
         return new Session();
     }

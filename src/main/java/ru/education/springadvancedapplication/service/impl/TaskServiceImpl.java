@@ -1,8 +1,8 @@
 package ru.education.springadvancedapplication.service.impl;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import ru.education.springadvancedapplication.config.annotation.Tx;
 import ru.education.springadvancedapplication.persistance.model.Session;
@@ -14,16 +14,11 @@ import java.util.Objects;
 @Slf4j
 @Service
 public  class TaskServiceImpl implements TaskService {
-
-//    @Lookup
-//    public Session getSession(){
-//        return null;
-//    }
-
+    @Getter
+    private Session session;
     @Autowired
-    private ApplicationContext context;
-    public Session getSession(){
-        return (Session) context.getBean("customSession");
+    private void setSession(Session session){
+        this.session=session;
     }
 
 

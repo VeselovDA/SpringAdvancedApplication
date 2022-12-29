@@ -1,5 +1,6 @@
 package ru.education.springadvancedapplication.service;
 
+import ru.education.springadvancedapplication.persistance.model.Session;
 import ru.education.springadvancedapplication.persistance.model.Task;
 
 public interface TaskService {

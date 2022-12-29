@@ -10,6 +10,11 @@ import ru.education.springadvancedapplication.config.bfpp.TxBeanFactoryPostProce
 import ru.education.springadvancedapplication.config.bpp.TxAnnotationBeanPostProcessor;
 import ru.education.springadvancedapplication.persistance.model.Session;
 
+
+import java.util.HashSet;
+
+import java.util.Set;
+
 @Configuration
 public class Config {
 
@@ -24,8 +29,13 @@ public class Config {
     }
 
     @Bean("customSession")
-    @Scope(value = "tx",proxyMode = ScopedProxyMode.TARGET_CLASS)
+    @Scope(value = "tx", proxyMode = ScopedProxyMode.TARGET_CLASS)
     public Session session() {
         return new Session();
+    }
+
+    @Bean
+    Set<String> dynamicRegisterBeans() {
+        return new HashSet<>();
     }
 }

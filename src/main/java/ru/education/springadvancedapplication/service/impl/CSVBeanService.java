@@ -50,6 +50,10 @@ public class CSVBeanService<T> implements BeanService {
     @SneakyThrows
     private void registerBeanToContext(BeanDto beanDto) {
         var id = beanDto.getId();
+        if(dynamicRegisterBeans.contains(id)){
+            log.warn("Bean with name {} already exist",id);
+            return;
+        }
         var clazz = Class.forName(beanDto.getType());
         @SuppressWarnings("unchecked cast")
         var type = (Class<T>) clazz;

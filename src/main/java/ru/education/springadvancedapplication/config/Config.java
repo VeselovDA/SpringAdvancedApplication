@@ -10,7 +10,6 @@ import ru.education.springadvancedapplication.config.bfpp.TxBeanFactoryPostProce
 import ru.education.springadvancedapplication.config.bpp.TxAnnotationBeanPostProcessor;
 import ru.education.springadvancedapplication.persistance.model.Session;
 
-
 import java.util.HashSet;
 
 import java.util.Set;

@@ -1,4 +1,4 @@
-testString|java.lang.String|Hello World!
+testString1|java.lang.String|Hello World!
 testInteger|java.lang.Integer|777
 testBoolean|java.lang.Boolean|true
-testPerson|ru.education.springadvancedapplication.persistance.model.Person|"{ ""name"": ""Дмитриев Дмитрий"", ""age"": 23, ""cards"": [{ ""type"": ""DEBIT"", ""accountNumber"": ""88005553535"", ""endDate"": ""2023-01-01"" }] }"
+testPerson|ru.education.springadvancedapplication.persistance.model.Person|"{ ""name"": ""Дмитриев Дмитрий"", ""age"": 23, ""cards"": [{ ""type"": ""DEBIT1"", ""accountNumber"": ""88005553535"", ""endDate"": ""2023-01-01"" }] }"

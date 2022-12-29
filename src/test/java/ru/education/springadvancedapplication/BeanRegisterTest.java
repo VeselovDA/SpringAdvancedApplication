@@ -2,6 +2,7 @@ package ru.education.springadvancedapplication;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import ru.education.springadvancedapplication.persistance.model.Person;
 import ru.education.springadvancedapplication.service.BeanService;
 
 import java.util.Set;
@@ -33,7 +34,6 @@ public class BeanRegisterTest extends BaseTest{
 
     @Test
     void getAllRegisterBean(){
-        beanService.registerBeanFromFile(null);
         beanService.getAllRegisterBean();
     }
 }
